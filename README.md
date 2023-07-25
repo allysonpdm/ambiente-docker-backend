@@ -1,2 +1,2 @@
-# ambiente-docker-backend
-Ambiente para desenvolvimento com nginx, php, mariadb, phpmyadmin e redis
+# ambiente-docker
+ Ambiente de desenvolvimento com nginx, php, mariadb, redis e phpmyadmin
