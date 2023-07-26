@@ -188,3 +188,10 @@ networks:
     backend:
         driver: bridge
 
+volumes:
+    mariadb:
+        driver: ${VOLUMES_DRIVER}
+    mysql:
+        driver: ${VOLUMES_DRIVER}
+    phpmyadmin:
+        driver: ${VOLUMES_DRIVER}
