@@ -125,33 +125,57 @@ services:
         networks:
             - backend
 
-    mariadb:
-        image: "mariadb:latest"
+#    mariadb:
+#        image: "mariadb:latest"
+#        volumes:
+#            - ./docker/mariadb/data:/var/lib/mysql
+#            - ./docker/mariadb/init:/docker-entrypoint-initdb.d
+#        ports:
+#            - "3306:3306"
+#        environment:
+#            - TZ=${WORKSPACE_TIMEZONE}
+#            - MYSQL_DATABASE=${MARIADB_DATABASE}
+#            - MYSQL_USER=${MARIADB_USER}
+#            - MYSQL_PASSWORD=${MARIADB_PASSWORD}
+#            - MYSQL_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
+#        networks:
+#            - backend
+
+    mysql:
+        image: mysql:latest
         restart: always
-        working_dir: /app
-        volumes:
-            - ".:/app"
-            - "./docker/mariadb/data:/var/lib/mysql"
-            - "./docker/mariadb/logs:/var/log/mysql"
-            - "./docker/mariadb/conf:/etc/mysql"
         environment:
-            MARIADB_ROOT_PASSWORD: "${MARIADB_ROOT_PASSWORD}"
-            MARIADB_DATABASE: "${MARIADB_DATABASE}"
-            MARIADB_USER: "${MARIADB_USER}"
-            MARIADB_PASSWORD: "${MARIADB_PASSWORD}"
+            - MYSQL_DATABASE=${MYSQL_DATABASE}
+            - MYSQL_USER=${MYSQL_USER}
+            - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+            - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+            - TZ=${WORKSPACE_TIMEZONE}
+        volumes:
+            - ./docker/mysql/data:/var/lib/mysql
+            - ./docker/mysql/init:/docker-entrypoint-initdb.d
+            - ./docker/mysql/my.conf:/etc/mysql/conf.d/my.conf
         ports:
             - "3306:3306"
+        networks:
+            - backend
 
     phpmyadmin:
         image: phpmyadmin/phpmyadmin
+        environment:
+            - PMA_ARBITRARY=1
+            - MYSQL_USER=${PMA_USER}
+            - MYSQL_PASSWORD=${PMA_PASSWORD}
+            - MYSQL_ROOT_PASSWORD=${PMA_ROOT_PASSWORD}
+            - MAX_EXECUTION_TIME=${PMA_MAX_EXECUTION_TIME}
+            - MEMORY_LIMIT=${PMA_MEMORY_LIMIT}
+            - UPLOAD_LIMIT=${PMA_UPLOAD_LIMIT}
         ports:
             - "8080:80"
         depends_on:
-            - mariadb
-        environment:
-            PMA_HOST: mariadb
-            PMA_USER: "${MARIADB_USER}"
-            PMA_PASSWORD: "${MARIADB_PASSWORD}"
+            - "${PMA_DB_ENGINE}"
+        networks:
+            - frontend
+            - backend
 
     redis:
         image: "redis:7.2-rc3-alpine"
